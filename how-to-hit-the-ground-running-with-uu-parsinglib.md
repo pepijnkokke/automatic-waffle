@@ -25,7 +25,7 @@ module HowToHitTheGroundRunning where
 | :visited        | a:visited       | Selects all visited links                       |
 +-----------------+-----------------+-------------------------------------------------+
 
-{% highligh   haskell %}
+{% highlight haskell %}
 main :: IO ()
 main = pu  S  rLn "I   works!"
 {% endhighligh   %}
