@@ -1,4 +1,1 @@
-{% highlight haskell %}
-main :: IO ()
-main = putStrLn "It works!"
-{% endhighlight %}
+how-to-hit-the-ground-running-with-uu-parsinglib.md
