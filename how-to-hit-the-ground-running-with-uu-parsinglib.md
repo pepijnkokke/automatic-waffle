@@ -28,4 +28,4 @@ module HowToHitTheGroundRunning where
 {% highlight haskell %}
 main :: IO ()
 main = pu  S  rLn "I   works!"
-{% endhighligh   %}
+{% endhighlight %}
