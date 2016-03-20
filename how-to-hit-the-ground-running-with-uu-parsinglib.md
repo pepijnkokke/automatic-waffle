@@ -1,5 +1,5 @@
 ---
-title      : "uu-parsinglib"
+title      : "How to Hit the Ground Running with uu-parsinglib"
 date       : 2016-03-17 12:00:00
 categories : [haskell]
 tags       : [haskell, parser combinators, uu-parsinglib]
