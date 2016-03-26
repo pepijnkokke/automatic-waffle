@@ -1,8 +1,8 @@
 ---
 title      : "How to Hit the Ground Running with uu-parsinglib"
 date       : 2016-03-17 12:00:00
-categories : [haskell]
-tags       : [haskell, parser combinators, uu-parsinglib]
+categories : [compsci]
+tags       : [haskell, parser combinators]
 ---
 
 Boop. Boop. Boop. Boop.
@@ -12,8 +12,8 @@ module HowToHitTheGroundRunning where
 
 import Text.Inflections (toDashed)
 import Text.ParserCombinators.UU (pAny)
-import Text.ParserCombinators.UU.BasicInstances (Parser)
-import Text.ParserCombinators.UU.Utils (runParser,pSymbol)
+import Text.ParserCombinators.UU.BasicInstances (Parser,pRange)
+import Text.ParserCombinators.UU.Utils (runParser,pSymbol,pAnySym)
 {% endhighlight %}
 
 <div class="hidden">
@@ -62,6 +62,7 @@ data PseudoElement
    deriving (Show,Eq,Bounded,Enum)
 {% endhighlight %}
 
+    h        [0-9a-f]
     nonascii [\240-\377]
     unicode  \\{h}{1,6}(\r\n|[ \t\r\n\f])?
     escape   {unicode}|\\[^\r\n\f0-9a-f]
@@ -70,6 +71,13 @@ data PseudoElement
     ident    -?{nmstart}{nmchar}*
 
 (Taken from <https://www.w3.org/TR/CSS21/grammar.html>.)
+
+{% highlight haskell %}
+pHexDigit, pNonAscii :: Parser Char
+pHexDigit = pAnySym "0123456789abcdef"
+pNonAscii = pRange ('\240','\377')
+{% endhighlight %}
+
 
 {% highlight haskell %}
 pPseudoClass :: Parser PseudoClass
