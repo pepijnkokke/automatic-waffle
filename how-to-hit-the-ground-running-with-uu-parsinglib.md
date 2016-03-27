@@ -75,7 +75,7 @@ data PseudoElement
 {% highlight haskell %}
 pHexDigit, pNonAscii :: Parser Char
 pHexDigit = pAnySym "0123456789abcdef"
-pNonAscii = pRange ('\240','\377')
+pNonAscii = pRange ('\240', maxBound)
 {% endhighlight %}
 
 
