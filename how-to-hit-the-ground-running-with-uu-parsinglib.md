@@ -1,11 +1,35 @@
 ---
-title      : "How to Hit the Ground Running with uu-parsinglib"
+title      : "How to run uu-parsinglib without hitting the ground..."
 date       : 2016-03-17 12:00:00
 categories : [compsci]
-tags       : [haskell, parser combinators]
+tags       : [haskell, parser combinators, uu-parsinglib]
 ---
 
-Boop. Boop. Boop. Boop.
+*This post is the first in a series of collaborations between
+[Stijn van Drongelen][Rhymoid] and me, in which we explore the parser
+combinator library [uu-parsinglib][uu-parsinglib] in an effort to make
+it more accessible to the general public.*
+
+There's a bit of an odd duck amongst the various Haskell parser
+combinator libraries. Its name is uu-parsinglib, and it was developed,
+for the most part, by Doaitse Swierstra, profesor emiratus at Utrecht
+University, where both Stijn and I happened to take our degree.
+The library has some beautiful features, absent in the more popular
+libraries like parsec and attoparsec, but it also is rather
+bare-bones, focusing on the core parser implementation. Consequently,
+it lacks some features which make the likes of parsec more
+user-friendly and accessible.
+
+In this series, we will implement several parsers using uu-parsinlib,
+explore its various features, and deal with some problems that come up
+in practice. Our preliminary planning is:
+
+  - Getting started, parsing CSS Selectors (this post);
+  - Parsing JSON with `Data.Text`;
+  - Online parsing, returning results as soon as possible;
+  - Error reporting;
+
+
 
 ``` haskell
 module HowToHitTheGroundRunning where
@@ -68,15 +92,16 @@ data PseudoElement
 
 ``` haskell
 pSelector :: Parser Selector
-pSelector = foldr1 In <$> pList1Sep pSpaces pSimpleSelector
+pSelector = foldr1 In <$> pSome pSimpleSelector
 ```
 
 ``` haskell
 pSimpleSelector :: Parser Selector
-pSimpleSelector = And <$> ((:) <$> pElement <*> pMany pOther)
-              <|> And <$> pSome pOther
+pSimpleSelector = lexeme (pIncElem <|> pExcElem)
   where
-    pOther = pId <|> pClass <|> pPseudoClass <|> pPseudoElement
+    pIncElem = And <$> pSome pOther
+    pExcElem = And <$> ((:) <$> pElement <*> pMany pOther)
+    pOther   = pId <|> pClass <|> pPseudoClass <|> pPseudoElement
 ```
 
 ``` haskell
@@ -129,28 +154,35 @@ pNonAscii = pRange (chr 160, maxBound) -- parses [\240-\4177777]
 
 ``` haskell
 pUnicode :: Parser Char
-pUnicode = toChar <$> (pBackslash *> pBetween 1 6 pHexDigit <* pOptSpace)
+pUnicode = decodeUTF8 <$> (pBackslash *> pBetween 1 6 pHexDigit <* pOptSpace)
   where
-    toChar :: String -> Char
-    toChar str = let [(hex,_)] = readHex str in chr hex
+    decodeUTF8 :: String -> Char
+    decodeUTF8 str = let [(hex,_)] = readHex str in chr hex
     pOptSpace :: Parser ()
     pOptSpace = () <$ pToken "\r\n" <|> () <$ pAnySym " \t\r\n\f" `opt` ()
+```
 
+``` haskell
 pEscape :: Parser Char
 pEscape = pUnicode <|> (pBackslash *> pNotHexDigitOrSpace)
   where
     pNotHexDigitOrSpace = pSatisfy
       (\x -> not (isHexDigit x || isSpace x))
-      (Insertion "[^\\r\\n\\f0-9a-f]" 'y' 5)
+      (Insertion "[^0-9a-f\\s]" 'y' 5)
 ```
 
 ``` haskell
 pNameStart, pNameChar :: Parser Char
 pNameStart = pSym '_' <|> pLetter <|> pNonAscii <|> pEscape
-pNameChar  = pSym '-' <|> pDigit  <|> pNameStart
+pNameChar  = pSym '-' <|> pDigit <|> pNameStart
 
 pIdent :: Parser String
 pIdent = pOptPrefix ((:) <$> pSym '-') ((:) <$> pNameStart <*> pMany pNameChar)
   where
     pOptPrefix p q = must_be_non_empty "pOptPrefix" p ((p `opt` id) <*> q)
 ```
+
+---
+
+[Rhymoid]: https://github.com/rhymoid
+[uu-parsinglib]: https://hackage.haskell.org/package/uu-parsinglib
