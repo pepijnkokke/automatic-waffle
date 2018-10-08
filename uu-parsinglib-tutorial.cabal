@@ -2,11 +2,11 @@ name:                uu-parsinglib-tutorial
 version:             0.1.0.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
-homepage:            http://github.com/pepijnkokke/uu-parsinglib-tutorial#readme
+homepage:            http://github.com/wenkokke/uu-parsinglib-tutorial#readme
 license:             MIT
 license-file:        LICENSE
-author:              Pepijn Kokke
-maintainer:          pepijnkokke@gmail.com
+author:              Wen Kokke
+maintainer:          wenkokke@gmail.com
 copyright:           2015
 category:            Test
 build-type:          Simple
@@ -38,4 +38,4 @@ test-suite HowToHitTheGroundRunningTest
 
 source-repository head
   type:     git
-  location: https://github.com/pepijnkokke/uu-parsinglib-tutorial
+  location: https://github.com/wenkokke/uu-parsinglib-tutorial
